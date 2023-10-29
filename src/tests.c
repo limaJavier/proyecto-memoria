@@ -16,17 +16,20 @@ static size_t curr_pid = 0;
 static program_t g_programs[MAX_PROGRAM_COUNT];
 
 // There are programs missing
-static void init_programs() {
+static void init_programs()
+{
   g_programs[0] = new_program("p_0", 235); // Program 0 with 235 bytes of size
   g_programs[1] = new_program("p_1", 235); // Program 1 with 235 bytes of size,
   g_programs[2] = new_program("p_2", 500); // Program 1 with 235 bytes of size
   g_programs[3] = new_program("p_3", 125); // Program 1 with 235 bytes of size
 }
 
-static void setup_test_case(const size_t mem_size, const char *log_name) {
+static void setup_test_case(const size_t mem_size, const char *log_name)
+{
   curr_pid = 0;
   char log_path[50];
-  if (snprintf(log_path, 50, "./mem_logs/%s_%s.log", run_argv[1], log_name) < 0) {
+  if (snprintf(log_path, 50, "./mem_logs/%s_%s.log", run_argv[1], log_name) < 0)
+  {
     fprintf(stderr, "Error building log file name\n");
     exit(1);
   }
@@ -37,46 +40,67 @@ static void setup_test_case(const size_t mem_size, const char *log_name) {
 // TEST CASE 1
 // ======================================================================
 
-void test_case_001() {
+void test_case_001()
+{
   setup_test_case(KB_SIZE(8), "case_001"); // Initialing memory with a 8Kb (8 * 1024 bytes) size
-  
+
   process_t processes[] = {
       PROCESS_FROM(0), // Process generated from program 0
       PROCESS_FROM(1), // Process generated from program 1
   };
 
-  ctx_switch(processes[0]);     // Cambia de contexto al proceso 0
+  ctx_switch(processes[0]);    // Cambia de contexto al proceso 0
   ptr_t p0_x = mem_malloc(4);  // Reserva memoria para 4 bytes
-  mem_store(at(p0_x), 10);      // Guarda el valor 10 en la posición 0
-  mem_store(at(p0_x) + 1, 20);  // Guarda el valor 20 en la posición 1
-  mem_push(70);                 // Añade al stack el valor 70
+  mem_store(at(p0_x), 10);     // Guarda el valor 10 en la posición 0
+  mem_store(at(p0_x) + 1, 20); // Guarda el valor 20 en la posición 1
+  mem_push(70);                // Añade al stack el valor 70
 
-  ctx_switch(processes[1]);     // Cambia de contexto al proceso 1
-  ptr_t p1_x = mem_malloc(2);   // Reserva 2 bytes de memoria
-  mem_store(at(p1_x), 30);      // Guarda el valor 30 en la posición 0
-  mem_store(at(p1_x) + 1, 40);  // Guarda el valor 40 en la posición 1
-  mem_push(80);                 // Añade al stack el valor 80
+  ctx_switch(processes[1]);    // Cambia de contexto al proceso 1
+  ptr_t p1_x = mem_malloc(2);  // Reserva 2 bytes de memoria
+  mem_store(at(p1_x), 30);     // Guarda el valor 30 en la posición 0
+  mem_store(at(p1_x) + 1, 40); // Guarda el valor 40 en la posición 1
+  mem_push(80);                // Añade al stack el valor 80
 
-  ctx_switch(processes[0]);           // Cambia de contexto al proceso 0
-  mem_load_assert(at(p0_x), 10);      // Comprueba que el valor en p0_x == 10
-  mem_load_assert(at(p0_x) + 1, 20);  // Comprueba que el valor p0_x + 1 == 20
-  mem_pop_assert(70);  // Comprueba que el ultimo valor de la pila es 70
+  ctx_switch(processes[0]);          // Cambia de contexto al proceso 0
+  mem_load_assert(at(p0_x), 10);     // Comprueba que el valor en p0_x == 10
+  mem_load_assert(at(p0_x) + 1, 20); // Comprueba que el valor p0_x + 1 == 20
+  mem_pop_assert(70);                // Comprueba que el ultimo valor de la pila es 70
 
-  ctx_switch(processes[1]);           // Cambia de contexto al proceso 1
-  mem_load_assert(at(p1_x), 30);      // Comprueba que el valor en p1_x == 30
-  mem_load_assert(at(p1_x) + 1, 40);  // Comprueba que el valor en p1_x == 40
-  mem_pop_assert(80);  // Comprueba que el ultimo valor de la pila es 80
+  ctx_switch(processes[1]);          // Cambia de contexto al proceso 1
+  mem_load_assert(at(p1_x), 30);     // Comprueba que el valor en p1_x == 30
+  mem_load_assert(at(p1_x) + 1, 40); // Comprueba que el valor en p1_x == 40
+  mem_pop_assert(80);                // Comprueba que el ultimo valor de la pila es 80
+
+  mem_free(p1_x); // Free p1_x
+
+  ptr_t p2_x = mem_malloc(20); 
+
+  mem_store(at(p2_x), 100);
+  mem_store(at(p2_x) + 19, 100);
+  mem_store(at(p2_x) + 18, 100);
+
+  mem_store(at(p2_x) + 3, mem_load(at(p2_x) + 19) + 100);
+  mem_store(at(p2_x) + 18, mem_load(at(p2_x) + 19) + mem_load(at(p2_x) + 3));
+  mem_push(mem_load(at(p2_x) + 18) - 60);
+
+  mem_pop_assert(240);
+  mem_load_assert(at(p2_x) + 3, 200);
+
+  m_on_ctx_switch(processes[0]);
+  mem_free(p0_x);
+  // mem_load(0);
 
   end_process(processes[0]);
   end_process(processes[1]);
-  end_sim();  // Termina la simulación
+  end_sim(); // Termina la simulación
 }
 
 // ======================================================================
 // TEST CASE 2
 // ======================================================================
 
-void test_case_002() {
+void test_case_002()
+{
   setup_test_case(KB_SIZE(8), "case_002");
   process_t processes[] = {
       PROCESS_FROM(0),
@@ -131,7 +155,8 @@ void test_case_002() {
 
 // ======================================================================
 
-void test_case_003() {
+void test_case_003()
+{
   setup_test_case(KB_SIZE(4), "case_003");
   process_t processes[] = {
       PROCESS_FROM(0),
@@ -205,7 +230,8 @@ void test_case_003() {
   end_sim();
 }
 
-void run_tests(int argc, char **argv) {
+void run_tests(int argc, char **argv)
+{
   init_programs();
   run_argc = argc;
   run_argv = argv;

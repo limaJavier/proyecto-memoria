@@ -10,7 +10,9 @@ bool is_valid_pointer(heap_manager manager, addr_t pointer)
         if (allocation == NULL)
             continue;
         if (allocation->pointer <= pointer && pointer < allocation->pointer + allocation->size)
+        {
             return TRUE;
+        }
     }
     return FALSE;
 }
@@ -62,19 +64,25 @@ void add_allocation(heap_allocation *allocations, size_t size, heap_allocation a
             fprintf(stderr, "Pointer already existing"), exit(1);
 
     for (int i = 0; i < size; i++)
+    {
         if (allocations[i] == NULL)
+        {
             allocations[i] = allocation;
+            break;
+        }
+    }
 }
 
 bool malloc_heap(heap_manager manager, size_t size, addr_t *pointer)
 {
     addr_t *bounds = get_space_free_list(manager->space_list, size, first_fit);
     if (bounds == NULL)
-        return FALSE;
+        return FALSE; // Heap overflow
 
     heap_allocation allocation = new_heap_allocation(bounds[0], bounds[1] - bounds[0]);
     add_allocation(manager->allocations, manager->size, allocation);
 
+    // Address transalation
     *pointer = bounds[0] + manager->physical_address;
     return TRUE;
 }
