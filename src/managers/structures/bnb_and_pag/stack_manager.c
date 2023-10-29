@@ -12,6 +12,8 @@ stack_manager new_stack_manager(addr_t from, addr_t to)
     manager->physical_address = to;
     manager->size = stack_size;
     manager->_stack = new_stack();
+
+    return manager;
 }
 
 bool push_stack_manager(stack_manager manager, byte value, addr_t* pointer)

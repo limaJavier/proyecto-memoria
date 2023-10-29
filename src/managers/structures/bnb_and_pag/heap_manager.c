@@ -95,6 +95,7 @@ bool store_to_heap(heap_manager manager, addr_t pointer, byte value)
     if (!is_valid_pointer(manager, heap_pointer))
         return FALSE;
     manager->virtual_heap[heap_pointer] = value;
+    return TRUE;
 }
 
 bool load_from_heap(heap_manager manager, addr_t pointer, byte *value)

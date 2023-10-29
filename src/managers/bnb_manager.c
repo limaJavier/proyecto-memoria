@@ -22,7 +22,7 @@ int m_bnb_malloc(size_t size, ptr_t *out)
   heap_manager heap = process->_heap_manager;
 
   addr_t address;
-  if(!malloc_heap(heap, size, &address))
+  if (!malloc_heap(heap, size, &address))
     return FALSE;
   (*out).size = size;
   (*out).addr = address;
@@ -35,7 +35,7 @@ int m_bnb_free(ptr_t ptr)
   pcb process = manager->current_process;
   heap_manager heap = process->_heap_manager;
 
-  if(!free_heap(heap, ptr.addr))
+  if (!free_heap(heap, ptr.addr))
     return FALSE;
   return TRUE;
 }
@@ -43,41 +43,57 @@ int m_bnb_free(ptr_t ptr)
 // Agrega un elemento al stack
 int m_bnb_push(byte val, ptr_t *out)
 {
-  fprintf(stderr, "Not Implemented\n");
-  exit(1);
+  pcb process = manager->current_process;
+  stack_manager _stack = process->_stack_manager;
+
+  addr_t pointer;
+  if (!push_stack_manager(_stack, val, &pointer))
+    return FALSE;
+  (*out).addr = pointer;
+  return TRUE;
 }
 
 // Quita un elemento del stack
 int m_bnb_pop(byte *out)
 {
-  fprintf(stderr, "Not Implemented\n");
-  exit(1);
+  pcb process = manager->current_process;
+  stack_manager _stack = process->_stack_manager;
+
+  if (!pop_stack_manager(_stack, out))
+    return FALSE;
+  return TRUE;
 }
 
 // Carga el valor en una dirección determinada
 int m_bnb_load(addr_t addr, byte *out)
 {
-  fprintf(stderr, "Not Implemented\n");
-  exit(1);
+  pcb process = manager->current_process;
+  heap_manager heap = process->_heap_manager;
+
+  if (!load_from_heap(heap, addr, out))
+    return FALSE;
+  return TRUE;
 }
 
 // Almacena un valor en una dirección determinada
 int m_bnb_store(addr_t addr, byte val)
 {
-  fprintf(stderr, "Not Implemented\n");
-  exit(1);
+  pcb process = manager->current_process;
+  heap_manager heap = process->_heap_manager;
+
+  if (!store_to_heap(heap, addr, val))
+    return FALSE;
+  return TRUE;
 }
 
 // Notifica un cambio de contexto al proceso 'next_pid'
 void m_bnb_on_ctx_switch(process_t process)
 {
-  fprintf(stderr, "Not Implemented\n");
-  exit(1);
+  change_process_memory_manager(manager, process);
 }
 
 // Notifica que un proceso ya terminó su ejecución
 void m_bnb_on_end_process(process_t process)
 {
-  fprintf(stderr, "Not Implemented\n");
-  exit(1);
+  end_process_memory_manager(manager, process);
 }
