@@ -26,9 +26,12 @@ heap_allocation pop_allocation(heap_manager manager, int pointer)
     return NULL;
 }
 
-heap_manager new_heap_manager(int physical_address, int end)
+heap_manager new_heap_manager(int from, int to)
 {
-    int heap_size = end - physical_address;
+    if(from >= to)
+        fprintf(stderr,"\"to\" must be strictly greater than \"from\""), exit(1);
+
+    int heap_size = to - from;
     heap_manager manager = (heap_manager)malloc(sizeof(struct heap_manager));
 
     manager->space_list = new_free_list();
@@ -40,7 +43,7 @@ heap_manager new_heap_manager(int physical_address, int end)
     for (int i = 0; i < heap_size; i++)
         manager->allocations[i] = NULL;
 
-    manager->physical_address = physical_address;
+    manager->physical_address = from;
     manager->size = heap_size;
 
     return manager;
