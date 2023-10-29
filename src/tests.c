@@ -15,9 +15,12 @@ static size_t curr_pid = 0;
 
 static program_t g_programs[MAX_PROGRAM_COUNT];
 
+// There are programs missing
 static void init_programs() {
   g_programs[0] = new_program("p_0", 235); // Program 0 with 235 bytes of size
-  g_programs[1] = new_program("p_1", 235); // Program 1 with 235 bytes of size
+  g_programs[1] = new_program("p_1", 235); // Program 1 with 235 bytes of size,
+  g_programs[2] = new_program("p_2", 500); // Program 1 with 235 bytes of size
+  g_programs[3] = new_program("p_3", 125); // Program 1 with 235 bytes of size
 }
 
 static void setup_test_case(const size_t mem_size, const char *log_name) {

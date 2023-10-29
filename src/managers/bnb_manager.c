@@ -45,12 +45,12 @@ int m_bnb_push(byte val, ptr_t *out)
 {
   pcb process = manager->current_process;
   stack_manager _stack = process->_stack_manager;
-
-
+  
   addr_t pointer;
   if (!push_stack_manager(_stack, val, &pointer))
     return FALSE;
   (*out).addr = pointer;
+
   return TRUE;
 }
 
