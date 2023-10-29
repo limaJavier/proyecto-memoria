@@ -1,5 +1,6 @@
-# Ignoring json files
+# Ignoring vscode files
 *.json
+.vscode
 
 # Prerequisites
 *.d

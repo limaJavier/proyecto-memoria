@@ -14,7 +14,7 @@ struct heap_manager
     int size;
 };
 
-heap_manager new_heap_manager(int physical_address, int end);
+heap_manager new_heap_manager(int from, int to);
 bool malloc_heap(heap_manager manager, int size, int *pointer);
 bool free_heap(heap_manager manager, int pointer);
 bool store_to_heap(heap_manager manager, int pointer, byte value);
