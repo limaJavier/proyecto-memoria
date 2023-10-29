@@ -1,3 +1,6 @@
+# Ignoring json files
+*.json
+
 # Prerequisites
 *.d
 

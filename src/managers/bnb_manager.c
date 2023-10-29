@@ -1,9 +1,18 @@
-#include "bnb_manager.h"
-
 #include "stdio.h"
 
-// Esta función se llama cuando se inicializa un caso de prueba
+#include "bnb_manager.h"
+
+
+// Available resources
+// m_size() => Size of the memory
+
+// Esta función se llama cuando se inicializa un caso de prueba. Debes tener en cuenta reinicializar aquellas estructuras globales extras que utilices en caso de ser necesario.
 void m_bnb_init(int argc, char **argv) {
+
+  int size = m_size();
+  memory_t physical_memory = (memory_t)malloc(size);
+
+
   fprintf(stderr, "Not Implemented\n");
   exit(1);
 }

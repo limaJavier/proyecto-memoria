@@ -16,8 +16,8 @@ static size_t curr_pid = 0;
 static program_t g_programs[MAX_PROGRAM_COUNT];
 
 static void init_programs() {
-  g_programs[0] = new_program("p_0", 235);
-  g_programs[1] = new_program("p_1", 235);
+  g_programs[0] = new_program("p_0", 235); // Program 0 with 235 bytes of size
+  g_programs[1] = new_program("p_1", 235); // Program 1 with 235 bytes of size
 }
 
 static void setup_test_case(const size_t mem_size, const char *log_name) {
@@ -35,10 +35,11 @@ static void setup_test_case(const size_t mem_size, const char *log_name) {
 // ======================================================================
 
 void test_case_001() {
-  setup_test_case(KB_SIZE(8), "case_001");
+  setup_test_case(KB_SIZE(8), "case_001"); // Initialing memory with a 8Kb (8 * 1024 bytes) size
+  
   process_t processes[] = {
-      PROCESS_FROM(0),
-      PROCESS_FROM(1),
+      PROCESS_FROM(0), // Process generated from program 0
+      PROCESS_FROM(1), // Process generated from program 1
   };
 
   ctx_switch(processes[0]);     // Cambia de contexto al proceso 0
