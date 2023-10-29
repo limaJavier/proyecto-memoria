@@ -15,6 +15,6 @@ struct memory_manager
 };
 
 memory_manager new_memory_manager(size_t memory_size);
-void change_process_memory_manager(memory_manager manager, process_t in_process);
+void change_process_memory_manager(memory_manager manager, process_t in_process, bool on_bnb);
 void end_process_memory_manager(memory_manager manager, process_t in_process);
 #endif

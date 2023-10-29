@@ -46,7 +46,7 @@ bool remove_process(memory_manager manager, int pid)
 {
     for (int i = 0; i < manager->size; i++)
     {
-        if(manager->processes[i] == NULL)
+        if (manager->processes[i] == NULL)
             continue;
         if (manager->processes[i]->pid == pid)
         {
@@ -64,14 +64,27 @@ pcb create_process_bnb(memory_manager manager, int pid, size_t size)
     return process;
 }
 
-void change_process_memory_manager(memory_manager manager, process_t in_process)
+pcb create_process_seg(memory_manager manager, int pid, size_t size)
+{
+    addr_t *heap_bounds = get_space_free_list(manager->space_list, size / 2, first_fit);
+    addr_t *stack_bounds = get_space_free_list(manager->space_list, size / 2, first_fit);
+    pcb process = new_pcb(pid, heap_bounds[0], stack_bounds[1], size / 2);
+    return process;
+}
+
+void change_process_memory_manager(memory_manager manager, process_t in_process, bool on_bnb)
 {
     pcb process = find_process(manager, in_process.pid);
 
     static int i = 0;
     if (process == NULL)
     {
-        process = create_process_bnb(manager, in_process.pid, in_process.program->size);
+
+        if (on_bnb)
+            process = create_process_bnb(manager, in_process.pid, in_process.program->size);
+        else
+            process = create_process_seg(manager, in_process.pid, in_process.program->size);
+
         manager->current_process = process;
         if (!add_process(manager, process))
             fprintf(stderr, "Out of memory"), exit(1);

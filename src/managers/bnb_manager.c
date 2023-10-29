@@ -3,9 +3,9 @@
 #include "./structures/bnb_and_pag/memory_manager.h"
 #include "bnb_manager.h"
 
+#define BNB 1
+
 static memory_manager manager;
-// Available resources
-// m_size() => Size of the memory
 
 // Esta función se llama cuando se inicializa un caso de prueba. Debes tener en cuenta reinicializar aquellas estructuras globales extras que utilices en caso de ser necesario.
 void m_bnb_init(int argc, char **argv)
@@ -90,7 +90,7 @@ int m_bnb_store(addr_t addr, byte val)
 // Notifica un cambio de contexto al proceso 'next_pid'
 void m_bnb_on_ctx_switch(process_t process)
 {
-  change_process_memory_manager(manager, process);
+  change_process_memory_manager(manager, process, BNB);
 }
 
 // Notifica que un proceso ya terminó su ejecución
