@@ -8,6 +8,8 @@ memory_manager new_memory_manager(size_t memory_size)
     memory_manager manager = (memory_manager)malloc(sizeof(struct memory_manager));
 
     manager->space_list = new_free_list();
+    initialize_free_list(manager->space_list, memory_size);
+
     manager->physical_memory = (byte *)malloc(memory_size * sizeof(byte));
     manager->current_process = NULL;
     manager->size = memory_size;
@@ -21,11 +23,10 @@ memory_manager new_memory_manager(size_t memory_size)
 
 pcb find_process(memory_manager manager, int pid)
 {
-    pcb process = NULL;
     for (int i = 0; i < manager->size; i++)
-        if (manager->processes[i]->pid == pid)
-            return process;
-    return process;
+        if (manager->processes[i] != NULL && manager->processes[i]->pid == pid)
+            return manager->processes[i];
+    return NULL;
 }
 
 bool add_process(memory_manager manager, pcb process)
@@ -45,6 +46,8 @@ bool remove_process(memory_manager manager, int pid)
 {
     for (int i = 0; i < manager->size; i++)
     {
+        if(manager->processes[i] == NULL)
+            continue;
         if (manager->processes[i]->pid == pid)
         {
             manager->processes[i] = NULL;
@@ -65,6 +68,7 @@ void change_process_memory_manager(memory_manager manager, process_t in_process)
 {
     pcb process = find_process(manager, in_process.pid);
 
+    static int i = 0;
     if (process == NULL)
     {
         process = create_process_bnb(manager, in_process.pid, in_process.program->size);

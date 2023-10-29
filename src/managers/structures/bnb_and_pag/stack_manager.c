@@ -19,11 +19,11 @@ stack_manager new_stack_manager(addr_t from, addr_t to)
 bool push_stack_manager(stack_manager manager, byte value, addr_t* pointer)
 {
     if(manager->_stack->count >= manager->size)
-        return FALSE;
+        return TRUE;
 
     *pointer = manager->physical_address - manager->_stack->count;
     push_stack(manager->_stack, value);
-    return TRUE;
+    return FALSE;
 }
 
 bool pop_stack_manager(stack_manager manager, byte* value)

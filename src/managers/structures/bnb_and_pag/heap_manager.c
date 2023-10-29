@@ -7,6 +7,8 @@ bool is_valid_pointer(heap_manager manager, addr_t pointer)
     for (int i = 0; i < manager->size; i++)
     {
         heap_allocation allocation = manager->allocations[i];
+        if (allocation == NULL)
+            continue;
         if (allocation->pointer <= pointer && pointer < allocation->pointer + allocation->size)
             return TRUE;
     }
@@ -18,6 +20,8 @@ heap_allocation pop_allocation(heap_manager manager, addr_t pointer)
     for (int i = 0; i < manager->size; i++)
     {
         heap_allocation allocation = manager->allocations[i];
+        if (allocation == NULL)
+            continue;
         if (allocation->pointer == pointer)
         {
             manager->allocations[i] = NULL;
@@ -30,8 +34,8 @@ heap_allocation pop_allocation(heap_manager manager, addr_t pointer)
 
 heap_manager new_heap_manager(addr_t from, addr_t to)
 {
-    if(from >= to)
-        fprintf(stderr,"\"to\" must be strictly greater than \"from\""), exit(1);
+    if (from >= to)
+        fprintf(stderr, "\"to\" must be strictly greater than \"from\""), exit(1);
 
     size_t heap_size = to - from;
     heap_manager manager = (heap_manager)malloc(sizeof(struct heap_manager));
@@ -54,11 +58,11 @@ heap_manager new_heap_manager(addr_t from, addr_t to)
 void add_allocation(heap_allocation *allocations, size_t size, heap_allocation allocation)
 {
     for (int i = 0; i < size; i++)
-        if (allocations[i]->pointer == allocation->pointer)
+        if (allocations[i] != NULL && allocations[i]->pointer == allocation->pointer)
             fprintf(stderr, "Pointer already existing"), exit(1);
 
     for (int i = 0; i < size; i++)
-        if (allocations[i] != NULL)
+        if (allocations[i] == NULL)
             allocations[i] = allocation;
 }
 
@@ -102,6 +106,7 @@ bool load_from_heap(heap_manager manager, addr_t pointer, byte *value)
 {
     // Address translation
     addr_t heap_pointer = pointer - manager->physical_address;
+
     if (!is_valid_pointer(manager, heap_pointer))
         return FALSE;
 
