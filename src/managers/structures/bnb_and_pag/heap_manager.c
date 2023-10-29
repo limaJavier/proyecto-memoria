@@ -1,6 +1,8 @@
+#include <stdio.h>
+#include <stdlib.h>
 #include "heap_manager.h"
 
-bool is_valid_pointer(heap_manager manager, int pointer)
+bool is_valid_pointer(heap_manager manager, addr_t pointer)
 {
     for (int i = 0; i < manager->size; i++)
     {
@@ -11,7 +13,7 @@ bool is_valid_pointer(heap_manager manager, int pointer)
     return FALSE;
 }
 
-heap_allocation pop_allocation(heap_manager manager, int pointer)
+heap_allocation pop_allocation(heap_manager manager, addr_t pointer)
 {
     for (int i = 0; i < manager->size; i++)
     {
@@ -26,12 +28,12 @@ heap_allocation pop_allocation(heap_manager manager, int pointer)
     return NULL;
 }
 
-heap_manager new_heap_manager(int from, int to)
+heap_manager new_heap_manager(addr_t from, addr_t to)
 {
     if(from >= to)
         fprintf(stderr,"\"to\" must be strictly greater than \"from\""), exit(1);
 
-    int heap_size = to - from;
+    size_t heap_size = to - from;
     heap_manager manager = (heap_manager)malloc(sizeof(struct heap_manager));
 
     manager->space_list = new_free_list();
@@ -49,7 +51,7 @@ heap_manager new_heap_manager(int from, int to)
     return manager;
 }
 
-void add_allocation(heap_allocation *allocations, int size, heap_allocation allocation)
+void add_allocation(heap_allocation *allocations, size_t size, heap_allocation allocation)
 {
     for (int i = 0; i < size; i++)
         if (allocations[i]->pointer == allocation->pointer)
@@ -60,9 +62,9 @@ void add_allocation(heap_allocation *allocations, int size, heap_allocation allo
             allocations[i] = allocation;
 }
 
-bool malloc_heap(heap_manager manager, int size, int *pointer)
+bool malloc_heap(heap_manager manager, size_t size, addr_t *pointer)
 {
-    int *bounds = get_space_free_list(manager->space_list, size, first_fit);
+    addr_t *bounds = get_space_free_list(manager->space_list, size, first_fit);
     if (bounds == NULL)
         return FALSE;
 
@@ -73,10 +75,10 @@ bool malloc_heap(heap_manager manager, int size, int *pointer)
     return TRUE;
 }
 
-bool free_heap(heap_manager manager, int pointer)
+bool free_heap(heap_manager manager, addr_t pointer)
 {
     // Address translation
-    int heap_pointer = pointer - manager->physical_address;
+    addr_t heap_pointer = pointer - manager->physical_address;
 
     heap_allocation allocation = pop_allocation(manager, heap_pointer);
     if (allocation == NULL)
@@ -86,19 +88,19 @@ bool free_heap(heap_manager manager, int pointer)
     return TRUE;
 }
 
-bool store_to_heap(heap_manager manager, int pointer, byte value)
+bool store_to_heap(heap_manager manager, addr_t pointer, byte value)
 {
     // Address translation
-    int heap_pointer = pointer - manager->physical_address;
+    addr_t heap_pointer = pointer - manager->physical_address;
     if (!is_valid_pointer(manager, heap_pointer))
         return FALSE;
     manager->virtual_heap[heap_pointer] = value;
 }
 
-bool load_from_heap(heap_manager manager, int pointer, byte *value)
+bool load_from_heap(heap_manager manager, addr_t pointer, byte *value)
 {
     // Address translation
-    int heap_pointer = pointer - manager->physical_address;
+    addr_t heap_pointer = pointer - manager->physical_address;
     if (!is_valid_pointer(manager, heap_pointer))
         return FALSE;
 

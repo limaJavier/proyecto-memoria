@@ -4,23 +4,23 @@
 #include "bool.h"
 #include "free_list.h"
 
-typedef void (*sort_space_blocks_action)(space_block *, int);
+typedef void (*sort_space_blocks_action)(space_block *, addr_t);
 
 // Auxiliary free-list methods
 void coalesce(free_list list, sort_space_blocks_action sort_blocks);
-void sort_space_blocks(space_block *blocks, int length);
+void sort_space_blocks(space_block *blocks, size_t length);
 
 // General-linked-list methods
-linked_node search_bounds_free_list(free_list list, int start, int end, int *node_index);
-linked_node search_index_free_list(free_list list, int index);
-bool insert_bounds_free_list(free_list list, int start, int end);
+linked_node search_bounds_free_list(free_list list, addr_t start, addr_t end, addr_t *node_index);
+linked_node search_index_free_list(free_list list, addr_t index);
+bool insert_bounds_free_list(free_list list, addr_t start, addr_t end);
 bool insert_block_free_list(free_list list, space_block block);
-bool remove_bounds_free_list(free_list list, int start, int end);
-bool remove_index_free_list(free_list list, int index);
+bool remove_bounds_free_list(free_list list, addr_t start, addr_t end);
+bool remove_index_free_list(free_list list, addr_t index);
 
 // Auxiliary general-linked-list methods
-void validate_bounds(int, int);
-bool are_bounds_valid_free_list(free_list list, int start, int end);
+void validate_bounds(addr_t, addr_t);
+bool are_bounds_valid_free_list(free_list list, addr_t start, addr_t end);
 
 free_list new_free_list()
 {
@@ -33,7 +33,7 @@ free_list new_free_list()
     return _free_list;
 }
 
-bool are_bounds_valid_free_list(free_list list, int start, int end)
+bool are_bounds_valid_free_list(free_list list, addr_t start, addr_t end)
 {
     validate_bounds(start, end);
 
@@ -59,7 +59,7 @@ bool are_bounds_valid_free_list(free_list list, int start, int end)
     return TRUE;
 }
 
-linked_node search_bounds_free_list(free_list list, int start, int end, int *node_index)
+linked_node search_bounds_free_list(free_list list, addr_t start, addr_t end, addr_t *node_index)
 {
     validate_bounds(start, end);
 
@@ -83,7 +83,7 @@ linked_node search_bounds_free_list(free_list list, int start, int end, int *nod
     return NULL;
 }
 
-linked_node search_index_free_list(free_list list, int index)
+linked_node search_index_free_list(free_list list, addr_t index)
 {
     if (index < 0 || index >= list->count)
         fprintf(stderr, "Index was outside of the bounds of the list"), exit(1);
@@ -104,7 +104,7 @@ linked_node search_index_free_list(free_list list, int index)
     return NULL;
 }
 
-bool insert_bounds_free_list(free_list list, int start, int end)
+bool insert_bounds_free_list(free_list list, addr_t start, addr_t end)
 {
     if (!are_bounds_valid_free_list(list, start, end))
         return FALSE;
@@ -126,9 +126,9 @@ bool insert_bounds_free_list(free_list list, int start, int end)
     return TRUE;
 }
 
-bool remove_bounds_free_list(free_list list, int start, int end)
+bool remove_bounds_free_list(free_list list, addr_t start, addr_t end)
 {
-    int node_index;
+    addr_t node_index;
     linked_node node = search_bounds_free_list(list, start, end, &node_index);
 
     if (node == NULL)
@@ -155,7 +155,7 @@ bool remove_bounds_free_list(free_list list, int start, int end)
     return TRUE;
 }
 
-bool remove_index_free_list(free_list list, int index)
+bool remove_index_free_list(free_list list, addr_t index)
 {
     linked_node node = search_index_free_list(list, index);
 
@@ -180,7 +180,7 @@ bool remove_index_free_list(free_list list, int index)
     return TRUE;
 }
 
-void sort_space_blocks(space_block *blocks, int length)
+void sort_space_blocks(space_block *blocks, size_t length)
 {
     for (int i = 0; i < length - 1; i++)
     {
@@ -221,9 +221,9 @@ bool insert_block_free_list(free_list list, space_block block)
     return TRUE;
 }
 
-int *first_fit(free_list list, int size)
+addr_t *first_fit(free_list list, size_t size)
 {
-    int *bounds = (int *)malloc(2 * sizeof(int));
+    addr_t *bounds = (addr_t *)malloc(2 * sizeof(addr_t));
     linked_node node = list->head;
 
     while (node != NULL)
@@ -244,7 +244,7 @@ int *first_fit(free_list list, int size)
 
 void coalesce(free_list list, sort_space_blocks_action sort_blocks)
 {
-    const int COUNT = list->count;
+    const size_t COUNT = list->count;
     space_block blocks[COUNT];
 
     // Storing all blocks
@@ -288,23 +288,23 @@ void coalesce(free_list list, sort_space_blocks_action sort_blocks)
 
 void initialize_free_list(free_list list, size_t total_size)
 {
-    space_block block = new_space_block(0, (int)total_size);
+    space_block block = new_space_block(0, total_size);
     insert_block_free_list(list, block);
 }
 
-int *get_space_free_list(free_list list, size_t size, get_space_action get_space)
+addr_t *get_space_free_list(free_list list, size_t size, get_space_action get_space)
 {
-    int *bounds = get_space(list, size);
+    addr_t *bounds = get_space(list, size);
 
     if(bounds == NULL)
         return NULL;
 
     bool matched_size = (bounds[1] - bounds[0]) == size;
 
-    int *to_deliver = (int *)malloc(2 * sizeof(int));
+    addr_t *to_deliver = (addr_t *)malloc(2 * sizeof(addr_t));
     to_deliver[0] = bounds[0], to_deliver[1] = bounds[0] + size;
 
-    int to_store_back[2];
+    addr_t to_store_back[2];
     if (!matched_size)
         to_store_back[0] = bounds[0] + size, to_store_back[1] = bounds[1];
 
@@ -318,7 +318,7 @@ int *get_space_free_list(free_list list, size_t size, get_space_action get_space
     return to_deliver;
 }
 
-void return_space_free_list(free_list list, int start, int end)
+void return_space_free_list(free_list list, addr_t start, addr_t end)
 {
     if (!insert_bounds_free_list(list, start, end))
         fprintf(stderr, "Invalid bounds"), exit(1);

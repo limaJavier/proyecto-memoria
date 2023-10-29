@@ -7,12 +7,12 @@ typedef struct stack_manager *stack_manager;
 struct stack_manager
 {
     stack _stack;
-    int physical_address;
-    int size;
+    addr_t physical_address;
+    size_t size;
 };
 
-stack_manager new_stack_manager(int from, int to);
-bool push_stack_manager(stack_manager manager, byte value, int *pointer);
+stack_manager new_stack_manager(addr_t from, addr_t to);
+bool push_stack_manager(stack_manager manager, byte value, addr_t *pointer);
 bool pop_stack_manager(stack_manager manager, byte *value);
 
 #endif

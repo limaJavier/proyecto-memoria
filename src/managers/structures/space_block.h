@@ -1,16 +1,16 @@
 #ifndef SPACE_BLOCK
 
-#include <stdio.h>
-#include <stdlib.h>
+#include "../../memory.h"
+
 typedef struct space_block *space_block;
 struct space_block
 {
-    int start;
-    int end;
-    int size;
+    addr_t start;
+    addr_t end;
+    size_t size;
 };
 
-void validate_bounds(int start, int end);
-space_block new_space_block(int start, int end);
+void validate_bounds(addr_t start, addr_t end);
+space_block new_space_block(addr_t start, addr_t end);
 
 #endif

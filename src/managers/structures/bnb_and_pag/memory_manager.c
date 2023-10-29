@@ -1,6 +1,9 @@
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "memory_manager.h"
 
-memory_manager new_memory_manager(int memory_size)
+memory_manager new_memory_manager(size_t memory_size)
 {
     memory_manager manager = (memory_manager)malloc(sizeof(struct memory_manager));
 
@@ -51,9 +54,9 @@ bool remove_process(memory_manager manager, int pid)
     return FALSE;
 }
 
-pcb create_process_bnb(memory_manager manager, int pid, int size)
+pcb create_process_bnb(memory_manager manager, int pid, size_t size)
 {
-    int *bounds = get_space_free_list(manager->space_list, size, first_fit);
+    addr_t *bounds = get_space_free_list(manager->space_list, size, first_fit);
     pcb process = new_pcb(pid, bounds[0], bounds[1], size);
     return process;
 }

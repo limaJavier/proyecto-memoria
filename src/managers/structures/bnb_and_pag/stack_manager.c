@@ -2,19 +2,19 @@
 #include <stdlib.h>
 #include "stack_manager.h"
 
-stack_manager new_stack_manager(int from, int to)
+stack_manager new_stack_manager(addr_t from, addr_t to)
 {
     if(from >= to)
         fprintf(stderr,"\"to\" must be strictly greater than \"from\""), exit(1);
         
-    int stack_size = to - from;
+    size_t stack_size = to - from;
     stack_manager manager = (stack_manager)malloc(sizeof(struct stack_manager));
     manager->physical_address = to;
     manager->size = stack_size;
     manager->_stack = new_stack();
 }
 
-bool push_stack_manager(stack_manager manager, byte value, int* pointer)
+bool push_stack_manager(stack_manager manager, byte value, addr_t* pointer)
 {
     if(manager->_stack->count >= manager->size)
         return FALSE;
