@@ -295,6 +295,10 @@ void initialize_free_list(free_list list, size_t total_size)
 int *get_space_free_list(free_list list, size_t size, get_space_action get_space)
 {
     int *bounds = get_space(list, size);
+
+    if(bounds == NULL)
+        return NULL;
+
     bool matched_size = (bounds[1] - bounds[0]) == size;
 
     int *to_deliver = (int *)malloc(2 * sizeof(int));
