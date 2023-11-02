@@ -43,7 +43,7 @@ void mem_init(size_t size, const char *log_file_path) {
   }
 
   g_log_file = fopen(log_file_path, "w+");
-  // assert(g_log_file);
+  assert(g_log_file);
   fprintf(g_log_file, "%lu\n", size);
 }
 
