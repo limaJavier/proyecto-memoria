@@ -100,6 +100,7 @@ byte mem_pop() {
 
 byte mem_pop_assert(byte val) {
   byte loaded_val = mem_pop();
+  printf("Value: %d \n", loaded_val);
   if (loaded_val != val) {
     printf(
         "[ERROR] (pid: %d) Incorrect value %d popped from stack (should have "

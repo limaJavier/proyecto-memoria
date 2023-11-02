@@ -45,7 +45,7 @@ heap_manager new_heap_manager(addr_t from, addr_t to)
     manager->space_list = new_free_list();
     initialize_free_list(manager->space_list, heap_size);
 
-    manager->virtual_heap = (byte *)malloc(heap_size * sizeof(byte));
+    // manager->virtual_heap = (byte *)malloc(heap_size * sizeof(byte));
 
     manager->allocations = (heap_allocation *)malloc(heap_size * sizeof(heap_allocation));
     for (int i = 0; i < heap_size; i++)
@@ -82,42 +82,48 @@ bool malloc_heap(heap_manager manager, size_t size, addr_t *pointer)
     heap_allocation allocation = new_heap_allocation(bounds[0], bounds[1] - bounds[0]);
     add_allocation(manager->allocations, manager->size, allocation);
 
-    // Address transalation
-    *pointer = bounds[0] + manager->physical_address;
+    // Address translation
+    *pointer = bounds[0];
     return TRUE;
 }
 
-bool free_heap(heap_manager manager, addr_t pointer)
+bool free_heap(heap_manager manager, addr_t virtual_pointer)
 {
     // Address translation
-    addr_t heap_pointer = pointer - manager->physical_address;
+    addr_t heap_pointer = virtual_pointer;
 
     heap_allocation allocation = pop_allocation(manager, heap_pointer);
     if (allocation == NULL)
         return FALSE;
 
     return_space_free_list(manager->space_list, allocation->pointer, allocation->pointer + allocation->size);
+
     return TRUE;
 }
 
-bool store_to_heap(heap_manager manager, addr_t pointer, byte value)
+bool store_to_heap(heap_manager manager, addr_t virtual_pointer, addr_t *real_pointer)
 {
-    // Address translation
-    addr_t heap_pointer = pointer - manager->physical_address;
-    if (!is_valid_pointer(manager, heap_pointer))
+    if (!is_valid_pointer(manager, virtual_pointer))
         return FALSE;
-    manager->virtual_heap[heap_pointer] = value;
+
+    // To remove
+    // manager->virtual_heap[heap_pointer] = value;
+
+    // Address translation
+    *real_pointer = virtual_pointer + manager->physical_address;
     return TRUE;
 }
 
-bool load_from_heap(heap_manager manager, addr_t pointer, byte *value)
+bool load_from_heap(heap_manager manager, addr_t virtual_pointer, addr_t *real_pointer)
 {
-    // Address translation
-    addr_t heap_pointer = pointer - manager->physical_address;
-
-    if (!is_valid_pointer(manager, heap_pointer))
+    if (!is_valid_pointer(manager, virtual_pointer))
         return FALSE;
 
-    *value = manager->virtual_heap[heap_pointer];
+    // To remove
+    // *value = manager->virtual_heap[heap_pointer];
+
+    // Address translation
+    *real_pointer = virtual_pointer + manager->physical_address;
+
     return TRUE;
 }

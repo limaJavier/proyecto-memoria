@@ -65,6 +65,7 @@ void test_case_001()
   mem_load_assert(at(p0_x), 10);     // Comprueba que el valor en p0_x == 10
   mem_load_assert(at(p0_x) + 1, 20); // Comprueba que el valor p0_x + 1 == 20
   mem_pop_assert(70);                // Comprueba que el ultimo valor de la pila es 70
+  printf("Cuba\n");
 
   ctx_switch(processes[1]);          // Cambia de contexto al proceso 1
   mem_load_assert(at(p1_x), 30);     // Comprueba que el valor en p1_x == 30

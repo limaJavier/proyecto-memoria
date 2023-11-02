@@ -21,11 +21,12 @@ int m_bnb_malloc(size_t size, ptr_t *out)
   pcb process = manager->current_process;
   heap_manager heap = process->_heap_manager;
 
-  addr_t address;
-  if (!malloc_heap(heap, size, &address))
+  addr_t virtual_address;
+  if (!malloc_heap(heap, size, &virtual_address))
     return FALSE;
+
   (*out).size = size;
-  (*out).addr = address;
+  (*out).addr = virtual_address;
   return TRUE;
 }
 
@@ -45,11 +46,17 @@ int m_bnb_push(byte val, ptr_t *out)
 {
   pcb process = manager->current_process;
   stack_manager _stack = process->_stack_manager;
-  
-  addr_t pointer;
-  if (!push_stack_manager(_stack, val, &pointer))
+
+  addr_t virtual_pointer;
+  addr_t real_pointer;
+  if (!push_stack_manager(_stack, val, &virtual_pointer, &real_pointer))
     return FALSE;
-  (*out).addr = pointer;
+
+  printf("Haban %lld \n", process->pid);
+  printf("Matanzas %lld \n", real_pointer);
+
+  m_write(real_pointer, val);
+  out->addr = virtual_pointer;
 
   return TRUE;
 }
@@ -60,8 +67,14 @@ int m_bnb_pop(byte *out)
   pcb process = manager->current_process;
   stack_manager _stack = process->_stack_manager;
 
-  if (!pop_stack_manager(_stack, out))
+  addr_t real_address;
+  if (!pop_stack_manager(_stack, &real_address))
     return FALSE;
+
+  printf("Haban %lld \n", process->pid);
+  printf("Matanzas %lld \n", real_address);
+
+  *out = m_read(real_address);
   return TRUE;
 }
 
@@ -71,8 +84,11 @@ int m_bnb_load(addr_t addr, byte *out)
   pcb process = manager->current_process;
   heap_manager heap = process->_heap_manager;
 
-  if (!load_from_heap(heap, addr, out))
+  addr_t real_pointer;
+  if (!load_from_heap(heap, addr, &real_pointer))
     return FALSE;
+  (*out) = m_read(real_pointer);
+  printf("%d", *out);
   return TRUE;
 }
 
@@ -82,19 +98,45 @@ int m_bnb_store(addr_t addr, byte val)
   pcb process = manager->current_process;
   heap_manager heap = process->_heap_manager;
 
-  if (!store_to_heap(heap, addr, val))
+  addr_t real_address;
+  if (!store_to_heap(heap, addr, &real_address))
     return FALSE;
+  m_write(real_address, val);
+
   return TRUE;
 }
 
 // Notifica un cambio de contexto al proceso 'next_pid'
 void m_bnb_on_ctx_switch(process_t process)
 {
-  change_process_memory_manager(manager, process, BNB);
+  bool created = FALSE;
+  addr_t *stack_data = (addr_t *)malloc(2 * sizeof(addr_t));
+  addr_t *heap_data = (addr_t *)malloc(2 * sizeof(addr_t));
+
+  change_process_memory_manager(manager, process, &stack_data, &heap_data, &created, BNB);
+
+  // set_curr_owner(process.pid);
+  if (created)
+  {
+    m_set_owner(heap_data[0], heap_data[0] + heap_data[1]);
+    m_set_owner(stack_data[0], stack_data[0] + stack_data[1]);
+    printf("sadasdsa %lld \n", heap_data[0]);
+    printf("sadasdsa %lld \n", heap_data[1]);
+    printf("sadasdsa %lld \n", stack_data[0]);
+    printf("sadasdsa %lld \n", stack_data[1]);
+  }
+
+  printf("Cuba: %d\n", process.pid);
 }
 
 // Notifica que un proceso ya terminó su ejecución
 void m_bnb_on_end_process(process_t process)
 {
-  end_process_memory_manager(manager, process);
+  addr_t *stack_data = (addr_t *)malloc(2 * sizeof(addr_t));
+  addr_t *heap_data = (addr_t *)malloc(2 * sizeof(addr_t));
+
+  end_process_memory_manager(manager, process, &stack_data, &heap_data);
+
+  m_unset_owner(stack_data[0], stack_data[0] + stack_data[1]);
+  m_unset_owner(heap_data[0], heap_data[0] + heap_data[1]);
 }

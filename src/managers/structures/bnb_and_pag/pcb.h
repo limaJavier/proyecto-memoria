@@ -13,6 +13,6 @@ struct pcb
     int size;
 };
 
-pcb new_pcb(int pid, int heap_address, int stack_address, int size);
+pcb new_pcb(int pid, addr_t heap_address, addr_t stack_address, size_t size);
 
 #endif
