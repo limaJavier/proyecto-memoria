@@ -1,6 +1,6 @@
 #ifndef SPACE_BLOCK
 
-#include "../../memory.h"
+#include "../../../memory.h"
 
 typedef struct space_block *space_block;
 struct space_block

@@ -1,7 +1,7 @@
 #ifndef STACK_MANAGER
 
-#include "../bool.h"
-#include "stack.h"
+#include "bool.h"
+#include "../../../memory.h"
 
 typedef struct stack_manager *stack_manager;
 struct stack_manager

@@ -3,6 +3,8 @@
 
 #include "memory_manager.h"
 
+#define STANDARD_SIZE 100
+
 memory_manager new_memory_manager(size_t memory_size)
 {
     memory_manager manager = (memory_manager)malloc(sizeof(struct memory_manager));
@@ -98,9 +100,9 @@ void change_process_memory_manager(memory_manager manager, process_t in_process,
     {
 
         if (on_bnb)
-            process = create_process_bnb(manager, in_process.pid, in_process.program->size, stack_data, heap_data);
+            process = create_process_bnb(manager, in_process.pid, in_process.program->size + STANDARD_SIZE, stack_data, heap_data);
         else
-            process = create_process_seg(manager, in_process.pid, in_process.program->size, stack_data, heap_data);
+            process = create_process_seg(manager, in_process.pid, in_process.program->size + STANDARD_SIZE, stack_data, heap_data);
 
         manager->current_process = process;
         if (!add_process(manager, process))

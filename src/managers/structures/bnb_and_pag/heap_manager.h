@@ -1,8 +1,8 @@
 #ifndef HEAP_MANAGER
 
 #include "../../../memory.h"
-#include "../free_list.h"
-#include "../bool.h"
+#include "free_list.h"
+#include "bool.h"
 #include "heap_allocation.h"
 typedef struct heap_manager *heap_manager;
 struct heap_manager
